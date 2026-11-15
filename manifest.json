@@ -1,8 +1,13 @@
 {
-  "name": "PedroModz666",
-  "short_name": "PedroModz",
-  "start_url": "./index.html",
+  "background_color": "#ffffff",
+  "dir": "ltr",
   "display": "standalone",
-  "background_color": "#0a0a0a",
-  "theme_color": "#e83434"
+  "name": "pedromora13.github",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "pedromora13.github",
+  "start_url": "/",
+  "theme_color": "#ffffff",
+  "id": "com.pedromodz666.app",
+  "description": "Panel de control y licencias de PedroModz666"
 }
