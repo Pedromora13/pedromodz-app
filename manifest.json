@@ -1,0 +1,8 @@
+{
+  "name": "PedroModz666",
+  "short_name": "PedroModz",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#e83434"
+}
