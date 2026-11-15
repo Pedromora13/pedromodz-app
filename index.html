@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PedroModz666 APK</title>
+    <style>
+        :root { --bg: #0a0a0a; --card: #141414; --accent: #e83434; --text: #f0f0f0; --text-d: #a8a8a8; --border: #2a2a2a; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg); color: var(--text); padding: 15px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .container { width: 100%; max-width: 400px; }
+        .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
+        h2 { text-align: center; color: var(--accent); margin-bottom: 5px; font-size: 1.8rem; text-transform: uppercase; letter-spacing: 1px; }
+        .subtitle { text-align: center; color: var(--text-d); font-size: 0.85rem; margin-bottom: 20px; }
+        .input-group { margin-bottom: 15px; }
+        input[type="text"] { width: 100%; padding: 12px; background: #1c1c1c; border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 1rem; text-align: center; letter-spacing: 1px; outline: none; transition: border-color 0.2s; }
+        input[type="text"]:focus { border-color: var(--accent); }
+        button { width: 100%; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; font-weight: bold; transition: opacity 0.2s, transform 0.1s; margin-bottom: 10px; }
+        button:active { transform: scale(0.98); }
+        .btn-primary { background: var(--accent); color: #fff; }
+        .btn-mod { background: #1f1f1f; color: var(--text); border: 1px solid var(--border); text-align: left; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; font-size: 0.95rem; }
+        .btn-mod:hover { border-color: var(--accent); background: #252525; }
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; text-transform: uppercase; font-weight: bold; }
+        .badge-vip { background: #eab308; color: #000; }
+        .badge-normal { background: #3b82f6; color: #fff; }
+        .hidden { display: none !important; }
+        .alert { padding: 10px; border-radius: 6px; font-size: 0.85rem; text-align: center; margin-bottom: 15px; }
+        .alert-error { background: rgba(220, 38, 38, 0.2); color: #ef4444; border: 1px solid #dc2626; }
+        .alert-success { background: rgba(46, 126, 50, 0.2); color: #22c55e; border: 1px solid #2e7e32; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- SECCIÓN DE LOGIN / KEY -->
+        <div id="loginSection" class="card">
+            <h2>PedroModz666</h2>
+            <div class="subtitle">Panel de Validación de Licencia</div>
+            
+            <div id="alertBox" class="alert alert-error hidden"></div>
+
+            <div class="input-group">
+                <input type="text" id="keyInput" placeholder="INGRESA TU LICENCIA" autocomplete="off">
+            </div>
+            <button class="btn-primary" onclick="verificarLicencia()">VALIDAR ACCESO</button>
+        </div>
+
+        <!-- SECCIÓN DE MENÚ DE MODS (OCULTO HASTA VALIDAR) -->
+        <div id="menuSection" class="card hidden">
+            <h2>Panel VIP</h2>
+            <div class="subtitle" id="rangoUsuario">Rango: Cargando...</div>
+
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">
+                <button class="btn-mod" onclick="ejecutarMod('Bypass Avión')">
+                    <span>🚀 Bypass Avión</span>
+                    <span style="color: var(--text-d); font-size: 0.8rem;">Activo</span>
+                </button>
+                <button class="btn-mod" onclick="ejecutarMod('Aimbot Pecho')">
+                    <span>🎯 Aimbot Pecho</span>
+                    <span style="color: var(--text-d); font-size: 0.8rem;">Estándar</span>
+                </button>
+                <button class="btn-mod" onclick="ejecutarMod('Aimbot Cuello')">
+                    <span>🎯 Aimbot Cuello</span>
+                    <span style="color: var(--text-d); font-size: 0.8rem;">Estándar</span>
+                </button>
+
+                <!-- OPCIÓN EXCLUSIVA VIP -->
+                <button id="btnVipCritico" class="btn-mod hidden" onclick="ejecutarMod('Aimbot Crítico VIP')" style="border-color: #eab308;">
+                    <span>⚠️🔥 Aimbot Crítico</span>
+                    <span class="badge badge-vip">VIP</span>
+                </button>
+
+                <button class="btn-mod" onclick="ejecutarMod('Bypass Offline')">
+                    <span>🛡️ Bypass Offline</span>
+                    <span style="color: var(--text-d); font-size: 0.8rem;">Sistema</span>
+                </button>
+
+                <button class="btn-primary" style="background: #dc2626; margin-top: 10px;" onclick="cerrarSesion()">CERRAR SESIÓN</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const FIREBASE_URL = 'https://pedromodz-keys-default-rtdb.firebaseio.com/keys';
+        let tipoActual = 'normal';
+
+        async function verificarLicencia() {
+            const key = document.getElementById('keyInput').value.trim();
+            const alertBox = document.getElementById('alertBox');
+
+            if (!key) {
+                mostrarAlerta('Por favor ingresa una licencia válida.');
+                return;
+            }
+
+            alertBox.classList.add('hidden');
+
+            try {
+                const response = await fetch(`${FIREBASE_URL}/${key}.json`);
+                const data = await response.json();
+
+                if (!data || data.status !== 'active') {
+                    mostrarAlerta('Licencia inválida, expirada o inactiva.');
+                    return;
+                }
+
+                tipoActual = data.type ? data.type.toLowerCase() : 'normal';
+
+                // Configurar interfaz según el rango
+                document.getElementById('loginSection').classList.add('hidden');
+                document.getElementById('menuSection').classList.remove('hidden');
+                
+                const rangoTxt = document.getElementById('rangoUsuario');
+                if (tipoActual === 'vip') {
+                    rangoTxt.innerHTML = 'Rango: <span class="badge badge-vip">VIP EXCLUSIVO</span>';
+                    document.getElementById('btnVipCritico').classList.remove('hidden');
+                } else {
+                    rangoTxt.innerHTML = 'Rango: <span class="badge badge-normal">NORMAL</span>';
+                    document.getElementById('btnVipCritico').classList.add('hidden');
+                }
+
+            } catch (error) {
+                mostrarAlerta('Error de conexión con el servidor Firebase.');
+            }
+        }
+
+        function mostrarAlerta(mensaje) {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.innerText = mensaje;
+            alertBox.classList.remove('hidden');
+        }
+
+        function ejecutarMod(nombreMod) {
+            alert(`[✔] ${nombreMod} aplicado correctamente en el sistema.`);
+        }
+
+        function cerrarSesion() {
+            document.getElementById('menuSection').classList.add('hidden');
+            document.getElementById('loginSection').classList.remove('hidden');
+            document.getElementById('keyInput').value = '';
+        }
+    </script>
+</body>
+</html>
